@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { initDb, closeDb } from './db/db-client'
 import { runMigrations } from './db/migrate'
+import { seedBibleIfEmpty } from './db/bible-seeder'
 import { registerIpcHandlers } from './ipc/handlers'
 import { closeAllOutputWindows } from './output/output-manager'
 
@@ -48,6 +49,7 @@ app.whenReady().then(async () => {
   try {
     initDb()
     runMigrations()
+    seedBibleIfEmpty()
   } catch (err) {
     console.error('[db] Failed to initialize database:', err)
     closeDb()

@@ -4,6 +4,7 @@ import { useDataStore } from './store/data-store'
 import { useAppStore } from './store/app-store'
 import AppShell from './components/layout/AppShell'
 import TableView from './views/TheTable/TableView'
+import BibleView from './views/Bible/BibleView'
 
 function ViewRouter(): React.JSX.Element {
   const view = useAppStore((s) => s.currentView)
@@ -12,7 +13,7 @@ function ViewRouter(): React.JSX.Element {
     case 'table':
       return <TableView />
     case 'bible':
-      return <Placeholder label="Bible" />
+      return <BibleView />
     case 'hymns':
       return <Placeholder label="Hymns" />
     case 'editor':
