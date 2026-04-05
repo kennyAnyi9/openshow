@@ -1,6 +1,36 @@
 import { useEffect } from 'react'
 import { ipc } from './ipc/bridge'
 import { useDataStore } from './store/data-store'
+import { useAppStore } from './store/app-store'
+import AppShell from './components/layout/AppShell'
+import TableView from './views/TheTable/TableView'
+
+function ViewRouter(): React.JSX.Element {
+  const view = useAppStore((s) => s.currentView)
+
+  switch (view) {
+    case 'table':
+      return <TableView />
+    case 'bible':
+      return <Placeholder label="Bible" />
+    case 'hymns':
+      return <Placeholder label="Hymns" />
+    case 'editor':
+      return <Placeholder label="Editor" />
+    case 'media':
+      return <Placeholder label="Settings" />
+    default:
+      return <Placeholder label="Coming soon" />
+  }
+}
+
+function Placeholder({ label }: { label: string }): React.JSX.Element {
+  return (
+    <div className="flex flex-1 items-center justify-center">
+      <p className="text-sm text-muted-foreground">{label} — coming soon</p>
+    </div>
+  )
+}
 
 function App(): React.JSX.Element {
   const { setShows, setSermons, setHymns, setBibleBooks } = useDataStore()
@@ -35,10 +65,9 @@ function App(): React.JSX.Element {
   }, [setShows, setSermons, setHymns, setBibleBooks])
 
   return (
-    <div className="app">
-      <h1>OpenShow</h1>
-      <p>Stores hydrated. Ready to build views.</p>
-    </div>
+    <AppShell>
+      <ViewRouter />
+    </AppShell>
   )
 }
 
