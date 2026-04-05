@@ -47,6 +47,7 @@ app.whenReady().then(async () => {
     runMigrations()
   } catch (err) {
     console.error('[db] Failed to initialize database:', err)
+    closeDb()
     app.exit(1)
     return
   }

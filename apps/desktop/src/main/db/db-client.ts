@@ -20,9 +20,7 @@ export function getSqlite(): Database.Database {
 export function initDb(): void {
   // Close existing connection if re-initializing
   if (_sqlite) {
-    _sqlite.close()
-    _sqlite = null
-    _db = null
+    closeDb()
   }
 
   const dbPath = join(app.getPath('userData'), 'openshow.db')
