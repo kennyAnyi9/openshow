@@ -5,6 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { initDb, closeDb } from './db/db-client'
 import { runMigrations } from './db/migrate'
 import { registerIpcHandlers } from './ipc/handlers'
+import { closeAllOutputWindows } from './output/output-manager'
 
 function createWindow(): void {
   // Create the browser window.
@@ -84,6 +85,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('will-quit', () => {
+  closeAllOutputWindows()
   closeDb()
 })
 

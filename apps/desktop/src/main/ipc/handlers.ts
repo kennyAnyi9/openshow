@@ -4,6 +4,12 @@ import { getDb } from '../db/db-client'
 import { shows, sermons, hymns, bibleBooks, bibleVerses, settings, outputs } from '../db/schema'
 import { ToMain } from '../../types/ipc'
 import type { IpcResult } from '../../types/ipc'
+import {
+  createOutputWindow,
+  closeOutputWindow,
+  projectSlide,
+  clearOutputWindow
+} from '../output/output-manager'
 
 function ok<T>(data: T): IpcResult<T> {
   return { success: true, data }
@@ -140,9 +146,38 @@ export function registerIpcHandlers(): void {
     }
   })
 
+  // ─── Output windows ────────────────────────────────────────────────────────
+
+  ipcMain.handle(ToMain.CREATE_OUTPUT_WINDOW, (_event, { outputId, displayIndex }) => {
+    try {
+      createOutputWindow(outputId, displayIndex)
+      return ok(undefined)
+    } catch (e) {
+      return err(e)
+    }
+  })
+
+  ipcMain.handle(ToMain.CLOSE_OUTPUT_WINDOW, (_event, outputId: string) => {
+    try {
+      closeOutputWindow(outputId)
+      return ok(undefined)
+    } catch (e) {
+      return err(e)
+    }
+  })
+
+  ipcMain.handle(ToMain.PROJECT_SLIDE, (_event, { outputId, slide }) => {
+    try {
+      projectSlide(outputId, slide)
+      return ok(undefined)
+    } catch (e) {
+      return err(e)
+    }
+  })
+
   ipcMain.handle(ToMain.CLEAR_OUTPUT, (_event, id: string) => {
     try {
-      db.delete(outputs).where(eq(outputs.id, id)).run()
+      clearOutputWindow(id)
       return ok(undefined)
     } catch (e) {
       return err(e)
