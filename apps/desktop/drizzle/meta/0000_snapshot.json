@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "65b4bd65-12f9-4617-b931-d0588f9f4a1d",
+  "id": "c527a2bc-c55e-45a6-b332-7683defafc0c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "bible_books": {
@@ -82,14 +82,6 @@
         }
       },
       "indexes": {
-        "bible_verses_book_chapter_idx": {
-          "name": "bible_verses_book_chapter_idx",
-          "columns": [
-            "book_id",
-            "chapter"
-          ],
-          "isUnique": false
-        },
         "bible_verses_lookup_idx": {
           "name": "bible_verses_lookup_idx",
           "columns": [
@@ -97,7 +89,7 @@
             "chapter",
             "verse"
           ],
-          "isUnique": false
+          "isUnique": true
         }
       },
       "foreignKeys": {

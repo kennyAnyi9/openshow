@@ -12,9 +12,20 @@ export function getDb(): ReturnType<typeof drizzle<typeof schema>> {
   return _db
 }
 
-export function initDb(): void {
-  const dbPath = join(app.getPath('userData'), 'openshow.db')
+export function getSqlite(): Database.Database {
+  if (!_sqlite) throw new Error('Database not initialized. Call initDb() first.')
+  return _sqlite
+}
 
+export function initDb(): void {
+  // Close existing connection if re-initializing
+  if (_sqlite) {
+    _sqlite.close()
+    _sqlite = null
+    _db = null
+  }
+
+  const dbPath = join(app.getPath('userData'), 'openshow.db')
   _sqlite = new Database(dbPath)
 
   // Performance and correctness pragmas
@@ -27,9 +38,13 @@ export function initDb(): void {
 }
 
 export function closeDb(): void {
-  _sqlite?.close()
+  try {
+    _sqlite?.close()
+  } catch (err) {
+    _sqlite = null
+    _db = null
+    throw err
+  }
   _sqlite = null
   _db = null
 }
-
-export { _sqlite as sqlite }

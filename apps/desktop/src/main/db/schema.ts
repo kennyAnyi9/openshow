@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, index, uniqueIndex } from 'drizzle-orm/sqlite-core'
 
 // ─── Shows ───────────────────────────────────────────────────────────────────
 
@@ -95,10 +95,7 @@ export const bibleVerses = sqliteTable(
     verse: integer('verse').notNull(),
     text: text('text').notNull()
   },
-  (t) => [
-    index('bible_verses_book_chapter_idx').on(t.bookId, t.chapter),
-    index('bible_verses_lookup_idx').on(t.bookId, t.chapter, t.verse)
-  ]
+  (t) => [uniqueIndex('bible_verses_lookup_idx').on(t.bookId, t.chapter, t.verse)]
 )
 
 // ─── Projects ────────────────────────────────────────────────────────────────

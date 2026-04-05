@@ -14,8 +14,7 @@ CREATE TABLE `bible_verses` (
 	FOREIGN KEY (`book_id`) REFERENCES `bible_books`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE INDEX `bible_verses_book_chapter_idx` ON `bible_verses` (`book_id`,`chapter`);--> statement-breakpoint
-CREATE INDEX `bible_verses_lookup_idx` ON `bible_verses` (`book_id`,`chapter`,`verse`);--> statement-breakpoint
+CREATE UNIQUE INDEX `bible_verses_lookup_idx` ON `bible_verses` (`book_id`,`chapter`,`verse`);--> statement-breakpoint
 CREATE TABLE `hymns` (
 	`id` text PRIMARY KEY NOT NULL,
 	`title` text NOT NULL,

@@ -40,10 +40,16 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  // Initialize database before anything else
-  initDb()
-  runMigrations()
+app.whenReady().then(async () => {
+  // Initialize database before anything else — exit cleanly on failure
+  try {
+    initDb()
+    runMigrations()
+  } catch (err) {
+    console.error('[db] Failed to initialize database:', err)
+    app.exit(1)
+    return
+  }
 
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.openshow')
@@ -71,10 +77,13 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  closeDb()
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+app.on('will-quit', () => {
+  closeDb()
 })
 
 // In this file you can include the rest of your app's specific main process
