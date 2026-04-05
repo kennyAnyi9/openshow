@@ -1,12 +1,19 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import type { ToMain, FromMain, ToMainPayloads, FromMainPayloads } from '../types/ipc'
+import { ToMain, FromMain } from '../types/ipc'
+import type { ToMainPayloads, FromMainPayloads } from '../types/ipc'
+
+const ALLOWED_INVOKE = new Set<string>(Object.values(ToMain))
+const ALLOWED_ON = new Set<string>(Object.values(FromMain))
 
 const api = {
   invoke<C extends ToMain>(
     channel: C,
     args: ToMainPayloads[C]['args']
   ): Promise<ToMainPayloads[C]['return']> {
+    if (!ALLOWED_INVOKE.has(channel)) {
+      return Promise.reject(new Error(`[ipc] Unknown invoke channel: ${channel}`))
+    }
     return ipcRenderer.invoke(channel, args)
   },
 
@@ -14,6 +21,9 @@ const api = {
     channel: C,
     listener: (payload: FromMainPayloads[C]) => void
   ): () => void {
+    if (!ALLOWED_ON.has(channel)) {
+      throw new Error(`[ipc] Unknown event channel: ${channel}`)
+    }
     const handler = (_event: Electron.IpcRendererEvent, payload: FromMainPayloads[C]): void =>
       listener(payload)
     ipcRenderer.on(channel, handler)

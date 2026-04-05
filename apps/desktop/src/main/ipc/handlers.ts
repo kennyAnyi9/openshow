@@ -1,5 +1,5 @@
 import { ipcMain, dialog } from 'electron'
-import { eq, like } from 'drizzle-orm'
+import { and, eq, like } from 'drizzle-orm'
 import { getDb } from '../db/db-client'
 import { shows, sermons, hymns, bibleBooks, bibleVerses, settings, outputs } from '../db/schema'
 import { ToMain } from '../../types/ipc'
@@ -90,9 +90,8 @@ export function registerIpcHandlers(): void {
         db
           .select()
           .from(bibleVerses)
-          .where(eq(bibleVerses.bookId, bookId))
+          .where(and(eq(bibleVerses.bookId, bookId), eq(bibleVerses.chapter, chapter)))
           .all()
-          .filter((v) => v.chapter === chapter)
       )
     } catch (e) {
       return err(e)
@@ -128,10 +127,13 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle(ToMain.SET_OUTPUT, (_event, output) => {
     try {
-      db.insert(outputs)
-        .values(output)
-        .onConflictDoUpdate({ target: outputs.id, set: output })
-        .run()
+      const existing = db.select().from(outputs).where(eq(outputs.id, output.id)).get()
+      if (existing) {
+        db.update(outputs).set(output).where(eq(outputs.id, output.id)).run()
+      } else {
+        if (!output.name) return err(new Error('output.name is required when creating a new output'))
+        db.insert(outputs).values(output as typeof outputs.$inferInsert).run()
+      }
       return ok(undefined)
     } catch (e) {
       return err(e)
