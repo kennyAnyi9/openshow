@@ -1,0 +1,22 @@
+{
+  "name": "openshow-monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:desktop": "turbo run dev --filter=desktop",
+    "dev:web": "turbo run dev --filter=web",
+    "build": "turbo run build",
+    "build:desktop": "turbo run build --filter=desktop",
+    "build:web": "turbo run build --filter=web",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "latest"
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "packageManager": "pnpm@10.33.0"
+}

@@ -1,0 +1,32 @@
+node_modules
+.turbo
+
+# Desktop build output
+apps/desktop/out
+apps/desktop/dist
+
+# Web build output
+apps/web/.next
+apps/web/out
+
+# Packages
+packages/*/dist
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.agents
+.claude
+skills-lock.json
+PLAN.md
+
+# Project reference (not part of source)
+FreeShow
+docs*
