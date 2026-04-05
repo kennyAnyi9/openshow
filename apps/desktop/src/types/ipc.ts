@@ -21,9 +21,12 @@ export enum ToMain {
   // Hymns
   GET_HYMNS = 'GET_HYMNS',
 
-  // Output
+  // Output windows
   SET_OUTPUT = 'SET_OUTPUT',
   CLEAR_OUTPUT = 'CLEAR_OUTPUT',
+  CREATE_OUTPUT_WINDOW = 'CREATE_OUTPUT_WINDOW',
+  CLOSE_OUTPUT_WINDOW = 'CLOSE_OUTPUT_WINDOW',
+  PROJECT_SLIDE = 'PROJECT_SLIDE',
 
   // System
   OPEN_FILE_DIALOG = 'OPEN_FILE_DIALOG',
@@ -38,7 +41,10 @@ export enum FromMain {
   SERMONS_LOADED = 'SERMONS_LOADED',
   SETTINGS_LOADED = 'SETTINGS_LOADED',
   OUTPUT_UPDATED = 'OUTPUT_UPDATED',
-  SERMON_IMPORT_PROGRESS = 'SERMON_IMPORT_PROGRESS'
+  SERMON_IMPORT_PROGRESS = 'SERMON_IMPORT_PROGRESS',
+  // Sent to output windows
+  SLIDE_UPDATE = 'SLIDE_UPDATE',
+  SLIDE_CLEAR = 'SLIDE_CLEAR'
 }
 
 // ─── Payload types ───────────────────────────────────────────────────────────
@@ -67,6 +73,9 @@ export interface ToMainPayloads {
 
   [ToMain.SET_OUTPUT]: { args: Partial<Output> & { id: string }; return: IpcResult<void> }
   [ToMain.CLEAR_OUTPUT]: { args: string; return: IpcResult<void> }
+  [ToMain.CREATE_OUTPUT_WINDOW]: { args: { outputId: string; displayIndex?: number }; return: IpcResult<void> }
+  [ToMain.CLOSE_OUTPUT_WINDOW]: { args: string; return: IpcResult<void> }
+  [ToMain.PROJECT_SLIDE]: { args: { outputId: string; slide: SlidePayload }; return: IpcResult<void> }
 
   [ToMain.OPEN_FILE_DIALOG]: {
     args: { filters?: { name: string; extensions: string[] }[] }
@@ -79,10 +88,19 @@ export interface ToMainPayloads {
   }
 }
 
+// Slide payload sent to output windows
+export interface SlidePayload {
+  text?: string
+  background?: string
+  items?: { id?: string; type: string; style?: string; content?: unknown }[]
+}
+
 export interface FromMainPayloads {
   [FromMain.SHOWS_LOADED]: Show[]
   [FromMain.SERMONS_LOADED]: Sermon[]
   [FromMain.SETTINGS_LOADED]: Record<string, unknown>
   [FromMain.OUTPUT_UPDATED]: Output
   [FromMain.SERMON_IMPORT_PROGRESS]: { progress: number; total: number; title: string }
+  [FromMain.SLIDE_UPDATE]: SlidePayload
+  [FromMain.SLIDE_CLEAR]: void
 }
