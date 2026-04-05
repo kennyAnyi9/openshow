@@ -7,17 +7,28 @@ function App(): React.JSX.Element {
 
   useEffect(() => {
     async function hydrate(): Promise<void> {
-      const [shows, sermons, hymns, bibleBooks] = await Promise.all([
-        ipc.getShows(),
-        ipc.getSermons(),
-        ipc.getHymns(),
-        ipc.getBibleBooks()
-      ])
+      try {
+        const [shows, sermons, hymns, bibleBooks] = await Promise.all([
+          ipc.getShows(),
+          ipc.getSermons(),
+          ipc.getHymns(),
+          ipc.getBibleBooks()
+        ])
 
-      if (shows.success) setShows(shows.data)
-      if (sermons.success) setSermons(sermons.data)
-      if (hymns.success) setHymns(hymns.data)
-      if (bibleBooks.success) setBibleBooks(bibleBooks.data)
+        if (shows.success) setShows(shows.data)
+        else console.error('[hydrate] getShows failed:', shows.error)
+
+        if (sermons.success) setSermons(sermons.data)
+        else console.error('[hydrate] getSermons failed:', sermons.error)
+
+        if (hymns.success) setHymns(hymns.data)
+        else console.error('[hydrate] getHymns failed:', hymns.error)
+
+        if (bibleBooks.success) setBibleBooks(bibleBooks.data)
+        else console.error('[hydrate] getBibleBooks failed:', bibleBooks.error)
+      } catch (e) {
+        console.error('[hydrate] IPC call threw unexpectedly:', e)
+      }
     }
 
     hydrate()
