@@ -178,7 +178,6 @@ export function registerIpcHandlers(): void {
   ipcMain.handle(ToMain.CLEAR_OUTPUT, (_event, id: string) => {
     try {
       clearOutputWindow(id)
-      db.delete(outputs).where(eq(outputs.id, id)).run()
       return ok(undefined)
     } catch (e) {
       return err(e)

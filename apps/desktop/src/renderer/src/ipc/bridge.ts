@@ -37,6 +37,11 @@ export const ipc = {
   setOutput: (output: ToMainPayloads[typeof ToMain.SET_OUTPUT]['args']) =>
     invoke(ToMain.SET_OUTPUT, output),
   clearOutput: (id: string) => invoke(ToMain.CLEAR_OUTPUT, id),
+  createOutputWindow: (outputId: string, displayIndex?: number) =>
+    invoke(ToMain.CREATE_OUTPUT_WINDOW, { outputId, displayIndex }),
+  closeOutputWindow: (outputId: string) => invoke(ToMain.CLOSE_OUTPUT_WINDOW, outputId),
+  projectSlide: (outputId: string, slide: ToMainPayloads[typeof ToMain.PROJECT_SLIDE]['args']['slide']) =>
+    invoke(ToMain.PROJECT_SLIDE, { outputId, slide }),
 
   openFileDialog: (filters?: { name: string; extensions: string[] }[]) =>
     invoke(ToMain.OPEN_FILE_DIALOG, { filters }),
