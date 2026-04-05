@@ -1,12 +1,26 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import type { ToMain, FromMain, ToMainPayloads, FromMainPayloads } from '../types/ipc'
 
-// Custom APIs for renderer
-const api = {}
+const api = {
+  invoke<C extends ToMain>(
+    channel: C,
+    args: ToMainPayloads[C]['args']
+  ): Promise<ToMainPayloads[C]['return']> {
+    return ipcRenderer.invoke(channel, args)
+  },
 
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
+  on<C extends FromMain>(
+    channel: C,
+    listener: (payload: FromMainPayloads[C]) => void
+  ): () => void {
+    const handler = (_event: Electron.IpcRendererEvent, payload: FromMainPayloads[C]): void =>
+      listener(payload)
+    ipcRenderer.on(channel, handler)
+    return () => ipcRenderer.removeListener(channel, handler)
+  }
+}
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
