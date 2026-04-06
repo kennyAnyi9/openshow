@@ -1,4 +1,4 @@
-import type { Show, Sermon, Hymn, BibleBook, BibleVerse, Output } from '../main/db/schema'
+import type { Show, Sermon, Hymn, BibleBook, BibleVerse, Output, MediaItem } from '../main/db/schema'
 
 // ─── Channels: Renderer → Main ───────────────────────────────────────────────
 
@@ -28,10 +28,16 @@ export enum ToMain {
   CLOSE_OUTPUT_WINDOW = 'CLOSE_OUTPUT_WINDOW',
   PROJECT_SLIDE = 'PROJECT_SLIDE',
 
+  // Media
+  GET_MEDIA_ITEMS = 'GET_MEDIA_ITEMS',
+  ADD_MEDIA_ITEM = 'ADD_MEDIA_ITEM',
+  DELETE_MEDIA_ITEM = 'DELETE_MEDIA_ITEM',
+
   // System
   OPEN_FILE_DIALOG = 'OPEN_FILE_DIALOG',
   GET_SETTINGS = 'GET_SETTINGS',
-  SAVE_SETTINGS = 'SAVE_SETTINGS'
+  SAVE_SETTINGS = 'SAVE_SETTINGS',
+  GET_DISPLAYS = 'GET_DISPLAYS'
 }
 
 // ─── Channels: Main → Renderer ───────────────────────────────────────────────
@@ -71,9 +77,13 @@ export interface ToMainPayloads {
 
   [ToMain.GET_HYMNS]: { args: void; return: IpcResult<Hymn[]> }
 
+  [ToMain.GET_MEDIA_ITEMS]: { args: void; return: IpcResult<MediaItem[]> }
+  [ToMain.ADD_MEDIA_ITEM]: { args: { filePath: string }; return: IpcResult<MediaItem> }
+  [ToMain.DELETE_MEDIA_ITEM]: { args: string; return: IpcResult<void> }
+
   [ToMain.SET_OUTPUT]: { args: Partial<Output> & { id: string }; return: IpcResult<void> }
   [ToMain.CLEAR_OUTPUT]: { args: string; return: IpcResult<void> }
-  [ToMain.CREATE_OUTPUT_WINDOW]: { args: { outputId: string; displayIndex?: number }; return: IpcResult<void> }
+  [ToMain.CREATE_OUTPUT_WINDOW]: { args: { outputId: string; displayIndex?: number; hyprlandName?: string }; return: IpcResult<void> }
   [ToMain.CLOSE_OUTPUT_WINDOW]: { args: string; return: IpcResult<void> }
   [ToMain.PROJECT_SLIDE]: { args: { outputId: string; slide: SlidePayload }; return: IpcResult<void> }
 
@@ -86,13 +96,28 @@ export interface ToMainPayloads {
     args: { key: string; value: unknown }
     return: IpcResult<void>
   }
+  [ToMain.GET_DISPLAYS]: { args: void; return: IpcResult<DisplayInfo[]> }
+}
+
+export interface DisplayInfo {
+  index: number
+  label: string
+  width: number
+  height: number
+  hyprlandName?: string
 }
 
 // Slide payload sent to output windows
 export interface SlidePayload {
   text?: string
   background?: string
+  backgroundMedia?: { url: string; type: 'image' | 'video' }
+  overlay?: boolean
   items?: { id?: string; type: string; style?: string; content?: unknown }[]
+}
+
+export function mediaUrl(absolutePath: string): string {
+  return `media://local/${btoa(encodeURIComponent(absolutePath))}`
 }
 
 export interface FromMainPayloads {

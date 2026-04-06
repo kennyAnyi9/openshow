@@ -19,7 +19,7 @@ export function seedBibleIfEmpty(): void {
     ? join(process.resourcesPath, 'kjv.json')
     : join(__dirname, '../../resources/kjv.json')
 
-  const books: KjvBook[] = JSON.parse(readFileSync(kjvPath, 'utf8'))
+  const books: KjvBook[] = JSON.parse(readFileSync(kjvPath, 'utf8').replace(/^\uFEFF/, ''))
 
   const insertBook = sqlite.prepare(
     'INSERT INTO bible_books (id, name, abbreviation, testament) VALUES (?, ?, ?, ?)'

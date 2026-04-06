@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Comic Relief';
+  src: url('./fonts/ComicRelief-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Comic Relief';
+  src: url('./fonts/ComicRelief-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -19,6 +35,8 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
+  --color-live: hsl(var(--live));
+  --color-live-foreground: hsl(var(--live-foreground));
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -46,6 +64,8 @@
     --border: 0 0% 18%;
     --input: 0 0% 18%;
     --ring: 0 0% 70%;
+    --live: 142 71% 45%;
+    --live-foreground: 0 0% 100%;
     --radius: 0.5rem;
   }
 
@@ -64,6 +84,7 @@
   body {
     @apply bg-background text-foreground;
     font-family:
+      'Comic Relief',
       Inter,
       -apple-system,
       BlinkMacSystemFont,

@@ -8,6 +8,13 @@
       "when": 1775366485959,
       "tag": "0000_freezing_invaders",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1775500735442,
+      "tag": "0001_first_gabe_jones",
+      "breakpoints": true
     }
   ]
 }

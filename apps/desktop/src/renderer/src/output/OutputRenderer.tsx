@@ -32,6 +32,47 @@ export default function OutputRenderer(): React.JSX.Element {
         background: slide.background ?? '#000'
       }}
     >
+      {/* Background media layer */}
+      {slide.backgroundMedia && (
+        slide.backgroundMedia.type === 'image' ? (
+          <img
+            src={slide.backgroundMedia.url}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover'
+            }}
+          />
+        ) : (
+          <video
+            src={slide.backgroundMedia.url}
+            autoPlay
+            loop
+            muted
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover'
+            }}
+          />
+        )
+      )}
+
+      {/* Dark overlay for text readability */}
+      {slide.overlay && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.55)'
+          }}
+        />
+      )}
+
       {/* Text layer */}
       {slide.text && (
         <div

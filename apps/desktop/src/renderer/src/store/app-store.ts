@@ -1,7 +1,14 @@
 import { create } from 'zustand'
 import type { Show, Sermon, Hymn } from '../../../main/db/schema'
+import type { SlidePayload } from '../../../types/ipc'
 
-export type AppView = 'table' | 'hymns' | 'bible' | 'media' | 'editor'
+export type AppView = 'hymns' | 'table' | 'bible'
+
+export const VIEW_LABELS: Record<AppView, string> = {
+  hymns: 'Songs',
+  table: 'Table',
+  bible: 'Bible'
+}
 
 export type ActiveItem =
   | { type: 'show'; data: Show }
@@ -21,10 +28,13 @@ interface AppState {
 
   selectedOutputId: string | null
   setSelectedOutputId: (id: string | null) => void
+
+  currentSlide: SlidePayload | null
+  setCurrentSlide: (slide: SlidePayload | null) => void
 }
 
 export const useAppStore = create<AppState>((set) => ({
-  currentView: 'table',
+  currentView: 'hymns',
   setCurrentView: (currentView) => set({ currentView }),
 
   activeItem: null,
@@ -34,5 +44,8 @@ export const useAppStore = create<AppState>((set) => ({
   setActiveSlideIndex: (activeSlideIndex) => set({ activeSlideIndex }),
 
   selectedOutputId: null,
-  setSelectedOutputId: (selectedOutputId) => set({ selectedOutputId })
+  setSelectedOutputId: (selectedOutputId) => set({ selectedOutputId }),
+
+  currentSlide: null,
+  setCurrentSlide: (currentSlide) => set({ currentSlide })
 }))

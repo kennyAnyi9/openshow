@@ -34,15 +34,20 @@ export const ipc = {
 
   getHymns: () => invoke(ToMain.GET_HYMNS, undefined),
 
+  getMediaItems: () => invoke(ToMain.GET_MEDIA_ITEMS, undefined),
+  addMediaItem: (filePath: string) => invoke(ToMain.ADD_MEDIA_ITEM, { filePath }),
+  deleteMediaItem: (id: string) => invoke(ToMain.DELETE_MEDIA_ITEM, id),
+
   setOutput: (output: ToMainPayloads[typeof ToMain.SET_OUTPUT]['args']) =>
     invoke(ToMain.SET_OUTPUT, output),
   clearOutput: (id: string) => invoke(ToMain.CLEAR_OUTPUT, id),
-  createOutputWindow: (outputId: string, displayIndex?: number) =>
-    invoke(ToMain.CREATE_OUTPUT_WINDOW, { outputId, displayIndex }),
+  createOutputWindow: (outputId: string, displayIndex?: number, hyprlandName?: string) =>
+    invoke(ToMain.CREATE_OUTPUT_WINDOW, { outputId, displayIndex, hyprlandName }),
   closeOutputWindow: (outputId: string) => invoke(ToMain.CLOSE_OUTPUT_WINDOW, outputId),
   projectSlide: (outputId: string, slide: ToMainPayloads[typeof ToMain.PROJECT_SLIDE]['args']['slide']) =>
     invoke(ToMain.PROJECT_SLIDE, { outputId, slide }),
 
+  getDisplays: () => invoke(ToMain.GET_DISPLAYS, undefined),
   openFileDialog: (filters?: { name: string; extensions: string[] }[]) =>
     invoke(ToMain.OPEN_FILE_DIALOG, { filters }),
   getSettings: () => invoke(ToMain.GET_SETTINGS, undefined),

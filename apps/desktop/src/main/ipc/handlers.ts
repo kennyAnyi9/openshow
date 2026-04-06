@@ -1,7 +1,10 @@
-import { ipcMain, dialog } from 'electron'
+import { ipcMain, dialog, screen } from 'electron'
+import { execSync } from 'child_process'
 import { and, eq, like } from 'drizzle-orm'
 import { getDb } from '../db/db-client'
-import { shows, sermons, hymns, bibleBooks, bibleVerses, settings, outputs } from '../db/schema'
+import { randomUUID } from 'crypto'
+import { basename, extname } from 'path'
+import { shows, sermons, hymns, bibleBooks, bibleVerses, settings, outputs, mediaItems } from '../db/schema'
 import { ToMain } from '../../types/ipc'
 import type { IpcResult } from '../../types/ipc'
 import {
@@ -148,9 +151,9 @@ export function registerIpcHandlers(): void {
 
   // ─── Output windows ────────────────────────────────────────────────────────
 
-  ipcMain.handle(ToMain.CREATE_OUTPUT_WINDOW, (_event, { outputId, displayIndex }) => {
+  ipcMain.handle(ToMain.CREATE_OUTPUT_WINDOW, (_event, { outputId, displayIndex, hyprlandName }) => {
     try {
-      createOutputWindow(outputId, displayIndex)
+      createOutputWindow(outputId, displayIndex, hyprlandName)
       return ok(undefined)
     } catch (e) {
       return err(e)
@@ -184,6 +187,54 @@ export function registerIpcHandlers(): void {
     }
   })
 
+  // ─── Media ─────────────────────────────────────────────────────────────────
+
+  ipcMain.handle(ToMain.GET_MEDIA_ITEMS, () => {
+    try {
+      return ok(db.select().from(mediaItems).all())
+    } catch (e) {
+      return err(e)
+    }
+  })
+
+  ipcMain.handle(ToMain.ADD_MEDIA_ITEM, (_event, { filePath }: { filePath: string }) => {
+    try {
+      const ext = extname(filePath).toLowerCase()
+      const imageExts = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg']
+      const videoExts = ['.mp4', '.webm', '.mov', '.avi', '.mkv']
+      const type = imageExts.includes(ext) ? 'image' : videoExts.includes(ext) ? 'video' : null
+      if (!type) return err(new Error(`Unsupported file type: ${ext}`))
+
+      const mimeMap: Record<string, string> = {
+        '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
+        '.gif': 'image/gif', '.webp': 'image/webp', '.bmp': 'image/bmp',
+        '.svg': 'image/svg+xml', '.mp4': 'video/mp4', '.webm': 'video/webm',
+        '.mov': 'video/quicktime', '.avi': 'video/x-msvideo', '.mkv': 'video/x-matroska'
+      }
+
+      const item = {
+        id: randomUUID(),
+        name: basename(filePath),
+        path: filePath,
+        type: type as 'image' | 'video',
+        mimeType: mimeMap[ext] ?? null
+      }
+      db.insert(mediaItems).values(item).run()
+      return ok({ ...item, createdAt: new Date() })
+    } catch (e) {
+      return err(e)
+    }
+  })
+
+  ipcMain.handle(ToMain.DELETE_MEDIA_ITEM, (_event, id: string) => {
+    try {
+      db.delete(mediaItems).where(eq(mediaItems.id, id)).run()
+      return ok(undefined)
+    } catch (e) {
+      return err(e)
+    }
+  })
+
   // ─── System ────────────────────────────────────────────────────────────────
 
   ipcMain.handle(ToMain.OPEN_FILE_DIALOG, async (_event, { filters } = {}) => {
@@ -191,6 +242,29 @@ export function registerIpcHandlers(): void {
       const result = await dialog.showOpenDialog({ properties: ['openFile'], filters })
       if (result.canceled || result.filePaths.length === 0) return ok(null)
       return ok(result.filePaths[0])
+    } catch (e) {
+      return err(e)
+    }
+  })
+
+  ipcMain.handle(ToMain.GET_DISPLAYS, () => {
+    try {
+      // Try to get Hyprland monitor names for accurate multi-monitor placement
+      let hyprMonitors: { id: number; name: string }[] = []
+      try {
+        hyprMonitors = JSON.parse(execSync('hyprctl monitors -j', { timeout: 1000 }).toString())
+      } catch {
+        // Not on Hyprland or hyprctl unavailable — fall back to Electron screen API
+      }
+
+      const displays = screen.getAllDisplays().map((d, index) => ({
+        index,
+        label: hyprMonitors[index]?.name ?? d.label ?? `Display ${index + 1}`,
+        width: d.bounds.width,
+        height: d.bounds.height,
+        hyprlandName: hyprMonitors[index]?.name
+      }))
+      return ok(displays)
     } catch (e) {
       return err(e)
     }

@@ -131,6 +131,17 @@ export const outputs = sqliteTable('outputs', {
   config: text('config', { mode: 'json' }).$type<Record<string, unknown>>().default({})
 })
 
+// ─── Media ──────────────────────────────────────────────────────────────────
+
+export const mediaItems = sqliteTable('media_items', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  path: text('path').notNull(),
+  type: text('type', { enum: ['image', 'video'] }).notNull(),
+  mimeType: text('mime_type'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
+
 // ─── Inferred types ───────────────────────────────────────────────────────────
 
 export type Show = typeof shows.$inferSelect
@@ -143,3 +154,4 @@ export type BibleBook = typeof bibleBooks.$inferSelect
 export type BibleVerse = typeof bibleVerses.$inferSelect
 export type Project = typeof projects.$inferSelect
 export type Output = typeof outputs.$inferSelect
+export type MediaItem = typeof mediaItems.$inferSelect

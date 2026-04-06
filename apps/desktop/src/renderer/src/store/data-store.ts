@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Show, Sermon, Hymn, BibleBook } from '../../../main/db/schema'
+import type { Show, Sermon, Hymn, BibleBook, MediaItem } from '../../../main/db/schema'
 
 interface DataState {
   // Shows
@@ -21,6 +21,13 @@ interface DataState {
   bibleBooks: BibleBook[]
   bibleBooksLoaded: boolean
   setBibleBooks: (books: BibleBook[]) => void
+
+  // Media
+  mediaItems: MediaItem[]
+  mediaLoaded: boolean
+  setMediaItems: (items: MediaItem[]) => void
+  addMediaItemToStore: (item: MediaItem) => void
+  removeMediaItemFromStore: (id: string) => void
 }
 
 export const useDataStore = create<DataState>((set) => ({
@@ -38,5 +45,13 @@ export const useDataStore = create<DataState>((set) => ({
 
   bibleBooks: [],
   bibleBooksLoaded: false,
-  setBibleBooks: (bibleBooks) => set({ bibleBooks, bibleBooksLoaded: true })
+  setBibleBooks: (bibleBooks) => set({ bibleBooks, bibleBooksLoaded: true }),
+
+  mediaItems: [],
+  mediaLoaded: false,
+  setMediaItems: (mediaItems) => set({ mediaItems, mediaLoaded: true }),
+  addMediaItemToStore: (item) =>
+    set((state) => ({ mediaItems: [...state.mediaItems, item] })),
+  removeMediaItemFromStore: (id) =>
+    set((state) => ({ mediaItems: state.mediaItems.filter((m) => m.id !== id) }))
 }))

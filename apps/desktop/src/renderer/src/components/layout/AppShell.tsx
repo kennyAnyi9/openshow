@@ -1,5 +1,4 @@
-import { TooltipProvider } from '@/components/ui/tooltip'
-import Sidebar from './Sidebar'
+import TopNav from './TopNav'
 
 interface AppShellProps {
   children: React.ReactNode
@@ -7,11 +6,9 @@ interface AppShellProps {
 
 export default function AppShell({ children }: AppShellProps): React.JSX.Element {
   return (
-    <TooltipProvider>
-      <div className="flex h-full w-full overflow-hidden bg-background">
-        <Sidebar />
-        <main className="flex flex-1 overflow-hidden">{children}</main>
-      </div>
-    </TooltipProvider>
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+      <TopNav />
+      <div className="flex flex-1 overflow-hidden">{children}</div>
+    </div>
   )
 }

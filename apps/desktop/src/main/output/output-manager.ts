@@ -1,5 +1,6 @@
 import { BrowserWindow, screen } from 'electron'
 import { join } from 'path'
+import { execSync } from 'child_process'
 import { is } from '@electron-toolkit/utils'
 import { FromMain } from '../../types/ipc'
 import type { SlidePayload } from '../../types/ipc'
@@ -11,7 +12,7 @@ interface OutputEntry {
 
 const outputWindows = new Map<string, OutputEntry>()
 
-export function createOutputWindow(outputId: string, displayIndex = 0): void {
+export function createOutputWindow(outputId: string, displayIndex = 0, hyprlandName?: string): void {
   if (outputWindows.has(outputId)) {
     outputWindows.get(outputId)!.window.focus()
     return
@@ -28,17 +29,31 @@ export function createOutputWindow(outputId: string, displayIndex = 0): void {
     height,
     show: false,
     frame: false,
-    fullscreen: true,
     alwaysOnTop: true,
     backgroundColor: '#000000',
+    title: `openshow-output-${outputId}`,
     webPreferences: {
-      preload: join(__dirname, '../../preload/index.js'),
+      preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
       contextIsolation: true
     }
   })
 
-  win.on('ready-to-show', () => win.show())
+  win.on('ready-to-show', () => {
+    win.show()
+
+    if (hyprlandName) {
+      // Hyprland (Wayland) ignores x,y position hints — move via hyprctl instead
+      try {
+        win.focus()
+        execSync(`hyprctl dispatch movewindow mon:${hyprlandName}`, { timeout: 1000 })
+      } catch (e) {
+        console.warn('[output-manager] hyprctl movewindow failed:', e)
+      }
+    }
+
+    win.setFullScreen(true)
+  })
 
   win.on('closed', () => {
     outputWindows.delete(outputId)

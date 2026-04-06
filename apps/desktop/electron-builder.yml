@@ -17,6 +17,8 @@ extraResources:
       - '**/*.json'
   - from: resources/kjv.json
     to: kjv.json
+  - from: resources/hymns.json
+    to: hymns.json
 asarUnpack:
   - 'resources/**'
 win:

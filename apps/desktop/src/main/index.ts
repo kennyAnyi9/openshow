@@ -5,16 +5,30 @@ import icon from '../../resources/icon.png?asset'
 import { initDb, closeDb } from './db/db-client'
 import { runMigrations } from './db/migrate'
 import { seedBibleIfEmpty } from './db/bible-seeder'
+import { seedHymnsIfEmpty } from './db/hymn-seeder'
 import { registerIpcHandlers } from './ipc/handlers'
 import { closeAllOutputWindows } from './output/output-manager'
+import {
+  registerMediaProtocolScheme,
+  registerMediaProtocol
+} from './protocol/media-protocol'
+
+// Ensure correct scaling on Wayland (Hyprland) — must run before app.whenReady()
+app.commandLine.appendSwitch('ozone-platform-hint', 'auto')
+app.commandLine.appendSwitch('enable-features', 'WaylandWindowDecorations')
+
+// Must be called before app.whenReady()
+registerMediaProtocolScheme()
 
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
+    width: 1280,
+    height: 800,
     minWidth: 800,
     minHeight: 560,
     show: false,
-    autoHideMenuBar: true,
+    autoHideMenuBar: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -50,6 +64,7 @@ app.whenReady().then(async () => {
     initDb()
     runMigrations()
     seedBibleIfEmpty()
+    seedHymnsIfEmpty()
   } catch (err) {
     console.error('[db] Failed to initialize database:', err)
     closeDb()
@@ -67,6 +82,7 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
+  registerMediaProtocol()
   registerIpcHandlers()
 
   createWindow()
