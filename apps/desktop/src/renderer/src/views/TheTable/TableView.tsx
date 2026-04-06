@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { useDataStore } from '@/store/data-store'
 import { useAppStore } from '@/store/app-store'
 import SlidePreviewPanel, { type SlideItem } from '@/components/SlidePreviewPanel'
+import MediaPanel from '@/components/MediaPanel'
 import type { Sermon } from '../../../../main/db/schema'
 
 function paragraphs(text: string): string[] {
@@ -113,24 +114,27 @@ export default function TableView(): React.JSX.Element {
       {/* Center: sermon content */}
       <main className="flex h-full flex-1 flex-col overflow-hidden">
         {selected ? (
-          <div className="flex-1 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="px-8 py-6">
-                {chunks.length === 0 ? (
-                  <p className="py-16 text-center text-sm text-muted-foreground">
-                    No text extracted yet.
-                  </p>
-                ) : (
-                  chunks.map((chunk, i) => (
-                    <p key={i} className="mb-4 text-sm leading-relaxed text-foreground/70">
-                      {chunk}
+          <>
+            <div className="flex-1 overflow-hidden">
+              <ScrollArea className="h-full">
+                <div className="px-8 py-6">
+                  {chunks.length === 0 ? (
+                    <p className="py-16 text-center text-sm text-muted-foreground">
+                      No text extracted yet.
                     </p>
-                  ))
-                )}
-              </div>
-              <div className="h-24" />
-            </ScrollArea>
-          </div>
+                  ) : (
+                    chunks.map((chunk, i) => (
+                      <p key={i} className="mb-4 text-sm leading-relaxed text-foreground/70">
+                        {chunk}
+                      </p>
+                    ))
+                  )}
+                </div>
+              </ScrollArea>
+            </div>
+
+            <MediaPanel />
+          </>
         ) : (
           <div className="flex flex-1 items-center justify-center">
             <p className="text-sm text-muted-foreground">Select a sermon</p>

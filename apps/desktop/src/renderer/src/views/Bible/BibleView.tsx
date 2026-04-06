@@ -9,6 +9,7 @@ import { useAppStore } from '@/store/app-store'
 import { chapterCount } from './kjv-chapters'
 import SlidePreviewPanel, { type SlideItem } from '@/components/SlidePreviewPanel'
 import SectionTabBar from '@/components/SectionTabBar'
+import MediaPanel from '@/components/MediaPanel'
 import type { BibleBook, BibleVerse } from '../../../../main/db/schema'
 
 export default function BibleView(): React.JSX.Element {
@@ -168,7 +169,6 @@ export default function BibleView(): React.JSX.Element {
                     ))
                   )}
                 </div>
-                <div className="h-24" />
               </ScrollArea>
             </div>
 
@@ -179,6 +179,8 @@ export default function BibleView(): React.JSX.Element {
                 onSelect={(key) => handleChapterSelect(Number(key))}
               />
             )}
+
+            <MediaPanel />
           </>
         ) : (
           <div className="flex flex-1 items-center justify-center">

@@ -10,6 +10,7 @@ import SectionTabBar from '@/components/SectionTabBar'
 import MediaPanel from '@/components/MediaPanel'
 import type { Hymn } from '../../../../main/db/schema'
 
+
 export default function HymnsView(): React.JSX.Element {
   const hymns = useDataStore((s) => s.hymns)
   const [query, setQuery] = useState('')
@@ -140,8 +141,7 @@ export default function HymnsView(): React.JSX.Element {
               />
             )}
 
-            {/* Intentional empty space below */}
-            <div className="h-64 shrink-0" />
+            <MediaPanel />
           </>
         ) : (
           <div className="flex flex-1 items-center justify-center">
